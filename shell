@@ -1,0 +1,73 @@
+export EDITOR=nano
+export DOTFILES_PATH="$HOME/dotfiles"
+
+# Only allow unique entries in the PATH variable
+# This function updates PATH by removing duplicates
+add_path() {
+  if ! [[ ":$PATH:" == *":$1:"* ]]; then
+    export PATH="$1:$PATH"
+  fi
+}
+
+alias ls='ls --color'
+alias ll='ls -lh'
+alias la='ls -ah'
+alias lla='ls -lah'
+alias ..='cd ..'
+
+alias e="$EDITOR"
+
+# Adding paths without creating duplicates
+add_path "${HOME}/bin"
+add_path "${HOME}/.bin"
+add_path "${HOME}/.local/bin"
+add_path "${HOME}/.cargo/bin"
+add_path "${HOME}/dotfiles/bin"
+add_path "/usr/local/bin"
+add_path "/usr/local/bin"
+add_path "/usr/bin"
+add_path "/usr/sbin"
+add_path "/bin"
+add_path "/sbin"
+add_path "/opt/homebrew/bin"
+
+# history conifg
+export HISTFILE="$HOME/.zsh_history"
+export SAVEHIST=10000
+export HISTSIZE=10000
+# Equivalent of zsh's HIST_IGNORE_DUPS in Bash
+export HISTCONTROL=ignoredups:erasedups
+# Appending to the history file, equivalent of INC_APPEND_HISTORY in zsh
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+
+
+
+if [ -n "$BASH_VERSION" ]; then
+  shopt -s histappend
+  export SHELL_ENV="bash"
+elif [ -n "$ZSH_VERSION" ]; then
+  export SHELL_ENV="zsh"
+fi
+
+source "$DOTFILES_PATH/src/updates.sh"
+
+source "$DOTFILES_PATH/src/std.sh"
+source "$DOTFILES_PATH/src/prompt.sh"
+source "$DOTFILES_PATH/src/tools.sh"
+source "$DOTFILES_PATH/src/secrets.sh"
+source "$DOTFILES_PATH/src/vendor.$VENDOR.sh"
+
+update_prompt
+secrets
+
+# See if we need some local overrides
+if [[ -f "$HOME/.${SHELL_ENV}rc.local" ]]; then
+  source "$HOME/.${SHELL_ENV}rc.local"
+fi
+
+# # Some things to grab
+add_package_report
+
+# Return true to indicate successful sourcing of the file
+return 0
